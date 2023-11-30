@@ -132,12 +132,11 @@ func NewBlockchain() *Blockchain {
 
 // Interface
 const (
-	Help               = "help"
-	AddBlock           = "add_block"
-	AddTransaction     = "add_transaction"
-	ViewBlockchain     = "view_blockchain"
-	TransactionHistory = "transaction_history"
-	Exit               = "exit"
+	Help           = "help"
+	AddBlock       = "add_block"
+	AddTransaction = "add_transaction"
+	ViewBlockchain = "view_blockchain"
+	Exit           = "exit"
 )
 
 var tempTransactions []*Transaction
@@ -146,7 +145,6 @@ var tempTransactions []*Transaction
 func parseCommand(input string, blockchain *Blockchain) {
 	parts := strings.Split(input, " ")
 	command := parts[0]
-
 	switch command {
 	case ViewBlockchain:
 		for _, block := range blockchain.blocks {
@@ -163,47 +161,45 @@ func parseCommand(input string, blockchain *Blockchain) {
 	case AddTransaction:
 		tx := &Transaction{[]byte(strings.Join(parts[1:], " "))}
 		tempTransactions = append(tempTransactions, tx)
-		fmt.Println("Added!")
+		fmt.Println("Add transaction successfully !")
 
 	case AddBlock:
-		blockchain.AddBlock(tempTransactions)
-		tempTransactions = nil
-		fmt.Println("Added!")
-
-	case TransactionHistory:
-		//duma deo them lam :))
-
+		if checkempty(tempTransactions) == false {
+			fmt.Println("Don`t have transaction!")
+		} else {
+			blockchain.AddBlock(tempTransactions)
+			tempTransactions = nil
+			fmt.Println("Add block successfully !")
+		}
 	case Exit:
 		fmt.Println("Exiting...")
 		return
 
 	case Help:
-		fmt.Println("help")
-		fmt.Println("add_block")
-		fmt.Println("add_transaction")
-		fmt.Println("view_blockchain")
-		fmt.Println("transaction_history")
+		help()
 
 	default:
 		fmt.Println("Invalid command. Type 'help' for a list of commands.")
 	}
 }
 
+func help() {
+	fmt.Println("help")
+	fmt.Println("add_block")
+	fmt.Println("add_transaction 'chuoi muon them'!")
+	fmt.Println("view_blockchain")
+}
+
+func checkempty(tempTransactions []*Transaction) bool {
+	if len(tempTransactions) == 0 {
+		return false
+	}
+	return true
+}
+
 func main() {
-	//var data[][]
+	help()
 	bc := NewBlockchain()
-
-	// Add a new block with a single transaction
-	tx1 := &Transaction{[]byte("This is transaction 1")}
-	bc.AddBlock([]*Transaction{tx1})
-
-	// Add another block with two transactions
-	tx2 := &Transaction{[]byte("This is transaction 2")}
-	bc.AddBlock([]*Transaction{tx2})
-
-	tx3 := &Transaction{[]byte("This is transaction 3")}
-	bc.AddBlock([]*Transaction{tx3})
-
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		// Get user input
@@ -215,7 +211,6 @@ func main() {
 			fmt.Println("Exiting...")
 			break
 		}
-
 		parseCommand(input, bc)
 	}
 }
